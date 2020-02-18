@@ -1,0 +1,17 @@
+参见  https://code.visualstudio.com/docs/python/jupyter-support
+ 1)命令行：pip install Jupyter   #网不好就可太难下了，smile
+    参见https://jupyter.org/install.html
+ 2)创建一个.py文件，包含
+ #%%
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import numpy as np
+
+x = np.linspace(0, 20, 100)
+plt.plot(x, np.sin(x))
+plt.show() 
+点击运行——RUN Cell——跳出jupyter扩展未装——点击install   参见https://marketplace.visualstudio.com/items?itemName=donjayamanne.jupyter
+
+3）错误：'Kernelspec' module not installed in the selected interpreter (D:\Python3.7\python.exe).
+ Please re-install or update 'jupyter'.
+ 
