@@ -15,3 +15,17 @@ plt.show()
 3）错误：'Kernelspec' module not installed in the selected interpreter (D:\Python3.7\python.exe).
  Please re-install or update 'jupyter'.
  
+**********************以上都没有用****************
+1）重换一个帐号VScode安装在D盘，Python3安装在D盘
+2）新建一个py文件，复制
+ #%%
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import numpy as np
+
+x = np.linspace(0, 20, 100)
+plt.plot(x, np.sin(x))
+plt.show() 
+运行
+3）底部跳除需安装的安装，直至全部完成
+4）重启VSCode即可
