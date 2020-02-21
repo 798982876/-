@@ -3,3 +3,18 @@
 3）继续安装 参见https://blog.csdn.net/qq_35732147/article/details/81169961
 ***********postgis下载未响应问题**********
 自己下载安装包 参见https://www.codetd.com/article/8904527
+**********postgreSQL学习*************
+1.对象关系型数据库（ORDBMS)
+2.打开——开始菜单的SQL Shell(psql)进入命令行菜单。键入密码
+3.postgres-# \help <command_name> 查看每个命令的用法
+4.数据类型，已有：常见——
+数值（numeric)
+货币（money)
+字符（varchar(n)、text)
+日期/时间（timestamp、date)
+布尔（boolean  true/false/NULL)
+枚举（命令创建 CREATE TYPE week AS ENUM(“mon"、"tue"....)->用于表和函数的定义
+几何类型（point、line直线、lseg有限线段、box矩形、path闭合路径（）、path开放路径[]、polygon、circle）
+网络地址类型（ inet cidr)
+位串（bit varying(n)
+
