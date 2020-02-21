@@ -5,8 +5,11 @@
 自己下载安装包 参见https://www.codetd.com/article/8904527
 **********postgreSQL学习*************
 1.对象关系型数据库（ORDBMS)
+
 2.打开——开始菜单的SQL Shell(psql)进入命令行菜单。键入密码
+
 3.postgres-# \help <command_name> 查看每个命令的用法
+
 4.数据类型，已有：常见——
 数值（numeric)
 货币（money)
@@ -14,7 +17,137 @@
 日期/时间（timestamp、date)
 布尔（boolean  true/false/NULL)
 枚举（命令创建 CREATE TYPE week AS ENUM(“mon"、"tue"....)->用于表和函数的定义
-几何类型（point、line直线、lseg有限线段、box矩形、path闭合路径（）、path开放路径[]、polygon、circle）
-网络地址类型（ inet cidr)
+几何（point、line直线、lseg有限线段、box矩形、path闭合路径（）、path开放路径[]、polygon、circle）
+网络地址（ inet cidr)
 位串（bit varying(n)
+UUID ->由标准定义的唯一通用标识符
+XML->XMLPRSE(DOCUMENT'<?xml ...>')创建
+JSON->array_to_json()、row_to_json()创建
+数组->声明： interger[]、ARRAY()关键字；{{a,b},{c,d}}二维表示；
+复合类型->取出复合类型中的元素(item).price
+范围类型->xx-range
+
+5.database数据库->CREATE DATABASE dbname  SQL语言\createdb dbname命令
+  命令窗口，进入到 PostgreSQL 的安装目录，并进入到 bin 目录，createdb 命令位于 PostgreSQL安装目录/bin 下，执行创建数据库的命令：
+  $ cd /Library/PostgreSQL/11/bin/
+  $ createdb -h localhost -p 5432 -U postgres runoobdb
+  password ******
+  以上命令我们使用了超级用户 postgres 登录到主机地址为 localhost，端口号为 5432 的 PostgreSQL 数据库中并创建 runoobdb 数据库。
+  
+  选择数据库
+-SQL Shell窗口
+  \l                  查看所有数据库
+  \c 数据库名          进入数据库 
+ -命令行窗口
+  D:\postgreSQL_GIS\bin>psql -h localhost -p 5432 -U postgres data_c
+  用户 postgres 的口令：
+  psql (10.11)
+  输入 "help" 来获取帮助信息.
+  data_c=#
+
+删除数据库->DROP DATABASE SQL语言/dropdb命令   D:\postgreSQL_GIS\bin> dropdb -h localhost -p 5432 -U postgres runoobdb
+
+
+6.table表格
+  CREATE TABLE tablename{
+  col1 datatype  PRIMARY KEY  NOT NULL,
+  col2 datatype,
+  ......
+  }
+  
+  \d 查看是否成功
+  \d tablename   查看表格信息
+  
+  删除表格
+  DROP TABLE tablename
+  
+  约束  数据规则  CREATE TABLE/ALTER TABLE时：
+  
+  
+  
+  
+
+7.schema 模式----一个表的集合
+   CREATE SCHEMA myschema 创建模式
+   CREATE TABLE myschema.table()创建模式下的表
+   查看表格是否创建 select * from myschema.table
+   
+   
+   删除模式（及其包含所有对象）  DROP SCHEMA myschema (CASCADE);
+
+
+8.INSERT INTO 插入记录
+   所有字段   INSERT INTO tabel_name VALUES (va11,val2...)
+   指定字段  INSERT INTO table_name ( col1name.col2name....) VALUES (val1,val2...); #字符串用单引号''
+   
+  SELECT colname,col2name... FROM table_name 选择数据   select *** as   ***  
+    表达式------
+       数学函数——avg()  sum()  count()查询记录总数
+       日期  SELECT CURRENT_TIMESTAMP
+     DISTINCT  获取重复记录中的唯一   SELECT DISTINCT
+  
+  UPDATE 更新数据库中的数据 
+    UPDATE table_name 
+    SET col1name = val1,col2name=val2...
+    WHERE[条件]
+    
+  DELETE FROM table_name WHERE[条件]
+ 
+ 9.WHERE[consition]  过滤
+   
+   运算符————
+     算数运算符：加+  减-  乘*  除/  取余%  指数^  平方根|/   立方根||/   阶乘 5!/!!5
+        select 2+3;
+     比较运算符：等于=   不等于 !=/<>  大于>  大于等于>=  小于等于<=
+     逻辑运算符：AND  OR  NOT(NOT BETWEEN;NOT EXISTS;NOT IN)
+         三值逻辑系统  TRUE NULL未知  FALSE
+         TRUE AND NULL ->NULL      FALSE AND NULL ->FALSE
+         TRUE OR  NULL ->TRUE      FALSE OR NULL  ->NULL
+         NOT NULL->NULL
+      位运算符：& | #(异或，相同0，不同1） ^ ~ << >>
+  
+    LIKE 通配符  %任意数量位置   _一个位置   SELECT * FROM COMPANY WHERE AGE::text LIKE '2%';
+
+
+10.GROUP BY 对相同数据进行分组   被分组的列必须存在于列清单中  必须放在 WHERE 子句中的条件之后，必须放在 ORDER BY 子句之前
+   SELECT NAME, SUM(SALARY) FROM COMPANY GROUP BY NAME ORDER BY NAME DESC;  计算每个人的总工资（按name对salary进行分组，并计算每组的sum）
+11.HAVING  筛选分组后的各组数据  必须放置于 GROUP BY 子句后面，ORDER BY 子句前面
+    SELECT NAME FROM COMPANY GROUP BY name HAVING count(name) < 2;
+11.ORDER BY 对所获记录按字段属性进行排序   ASC升序 DESC降序  SELECT * FROM COMPANY ORDER BY NAME, SALARY ASC;
+12.LIMIT 限制记录数量  OFFSET开始位置的偏移   从第三位开始提取 3 个记录：SELECT * FROM COMPANY LIMIT 3 OFFSET 2;
+13.WITH 辅助分段查询
+
+
+    
+
+
+    
+    
+    
+  
+     
+      
+      
+     
+     
+ 
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
