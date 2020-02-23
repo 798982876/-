@@ -59,9 +59,24 @@ JSON->array_to_json()、row_to_json()创建
   \d tablename   查看表格信息
   
   删除表格
-  DROP TABLE tablename
+  DROP TABLE tablename  删除表数据和表结构
+  TRUNCATE TABLE tablename  删除表数据但保留表结构
+  
+  
   
   约束  数据规则  CREATE TABLE/ALTER TABLE时：
+     NOT NULL 列不能为空
+     UNIQUE  列值唯一
+     PRIMARY KEY  =NOT NULL  +  UNIQUE  唯一标识符
+     FOREIGN  KEY  另一个表参照 完整      references COMPANY6(ID)
+     CHECK  保证列值符合指定条件    CHECK(SALARY > 0)
+     EXCLUSION 排他约束
+  删除约束  ALTER TABLE table_name DROP CONSTRAINT some_name;
+  
+  DEFAULT 50000.00 列默认值
+  
+ 
+ 
   
   
   
@@ -107,6 +122,7 @@ JSON->array_to_json()、row_to_json()创建
       位运算符：& | #(异或，相同0，不同1） ^ ~ << >>
   
     LIKE 通配符  %任意数量位置   _一个位置   SELECT * FROM COMPANY WHERE AGE::text LIKE '2%';
+    NULL---- WHERE SALARY IS (NOT) NULL
 
 
 10.GROUP BY 对相同数据进行分组   被分组的列必须存在于列清单中  必须放在 WHERE 子句中的条件之后，必须放在 ORDER BY 子句之前
@@ -118,13 +134,26 @@ JSON->array_to_json()、row_to_json()创建
 13.WITH 辅助分段查询
 
 
-    
+ 14.JOIN 多表行结合
+    CROSS JOIN  --- x行表 CROSS JOIN y行表= x*y 行表
+    INNER JOIN 默认并常用   每一行进行比较，找到所有满足连接谓词的行的匹配对。当满足连接谓词时，A 和 B 行的每个匹配对的列值会合并成一个结果行
+        SELECT table1.column1, table2.column2..
+        FROM table1  
+        INNER JOIN table2 
+        ON table1.common_filed = table2.common_field;
+    LEFT OUTER JOIN 左外连接 ----内连接时 左表的所有列都显示，若右表不满足匹配，其记录值为null
+    RIGHT OUTER JOIN 右外连接 ----与左外相反
+    FULL OUTER JION  外连接---左右都显示全，不匹配的为null
 
-
+15.UNION 合并多个SELECT语句结果  列必须相同 ----UNION ALL 允许重复值
     
-    
-    
-  
+16.AUTO INCREMENT自动增长  ----SMALLSERIAL、SERIAL、BIGSERIAL   CREATE TABLE COMPANY(
+                                                                         ID  SERIAL PRIMARY KEY,//不需要插入数据
+                                                                         NAME           TEXT      NOT NULL,
+                                                                         AGE            INT       NOT NULL,
+                                                                         ADDRESS        CHAR(50),
+                                                                         SALARY         REAL
+                                                                      );
      
       
       
