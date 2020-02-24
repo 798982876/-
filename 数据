@@ -1,7 +1,64 @@
 1.选择数据——sid  辖区代码（排序） 时间（排序） 地理位置  损失情况描述（已删除的删除） 关注警情类别（入户盗窃）
    select sid ,"辖区代码","时间","地理位置","关注警情类别" from incident."核警信息表"
 2.存入文件--客户端拉取服务端数据至本地
-  https://blog.csdn.net/fm0517/article/details/52995951  copy重定向×
+ 1) https://blog.csdn.net/fm0517/article/details/52995951  copy重定向×
+ 2) 装 Python3 读取另存为csv 👌  参见 https://www.yiibai.com/postgresql/postgresql_python.html
+ 3)  create extension postgis  --支持空间数据  参见https://blog.csdn.net/Daisy_jf/article/details/95947151?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task
+ 4）创建表 
+                             数据表 "incident.核警信息表"
+        栏位     |          类型           | Collation | Nullable | Default
+   --------------+-------------------------+-----------+----------+---------
+    sid          | character(36)           |           |          |
+    接警单编号   | character varying(40)   |           |          |
+    辖区代码     | character varying(32)   |           |          |
+    辖区名称     | character varying(128)  |           |          |
+    时间         | character varying(14)   |           |          |
+    内容         | character varying(2000) |           |          |
+    地址         | character varying(256)  |           |          |
+    地理位置     | geography(Point,4326)   |           |          |
+    损失情况描述 | character varying(2000) |           |          |
+    关注警情类别 | character varying(32)   |           |          |
+   postgres=# create extension postgis;
+   CREATE EXTENSION
+   postgres=# create table da (sid character(36),xiaqu  character varying(32) ,time character varying(14),location geography(Point,4326),type character varying(32));
+   CREATE TABLE
+   
+  5) Python插入数据
+   import psycopg2
+   #连接数据库
+   conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="589555", host="132.1.11.157", port="5432")
+   conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+   print("Opened database successfully")
+
+   #数据游标
+   cur = conn.cursor()
+   cur1 = conn1.cursor()
+
+   #select操作
+   cur.execute("select sid,"'辖区代码'","'时间'" ,"'地理位置'","'关注警情类别'" from incident."'核警信息表'"")
+   rows = cur.fetchall()
+   for row in rows:   
+       sql1="insert into da values"+str(row)
+       #print(sql1)
+       cur1.execute(sql1)
+   conn1.commit()#提交运行结果
+   print("插入成功")
+   #sql2 = "select * from da"
+   #cur1.execute(sql2)
+   #rows = cur1.fetchall()
+   #for row in rows:
+       #print(str(row))
+   cur.close()
+   cur1.close()
+   conn.close()
+   conn1.close()
+ 6)backup 备份至本地————以便传入另一个桌面的本地数据库 Custom UTF8
+ 7）本地restore :  create extension postgis;安装空间数据库拓展 ，restore .backup 🆗
+ 
+ 
+ 
+ 
+ 
   
   
 
