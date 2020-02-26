@@ -382,7 +382,7 @@ print("Opened database successfully")
 #数据游标
 cur1 = conn1.cursor()
 #创建警情信息表
-sql = '''create table policein_a (
+sql = '''create table policein_aa (
         sid               character(32) ,                   
          接警单号          character varying(40),      
          接警情况          text,         
@@ -391,11 +391,10 @@ sql = '''create table policein_a (
          处警情况          text,         
          处警意见          character varying(256),          
          出警情况          text,         
-         出警警情          text,                                                   
- ;'''
+         出警警情          text);'''
 
 #创建警情表
-sql1='''create table policein_b (
+sql1='''create table policein_bb (
  系统编号            character(36)            primary key          not null ,
  接警单编号          character varying(40)    unique,
  接警单位代码        character varying(32)    ,
@@ -411,7 +410,7 @@ sql1='''create table policein_b (
 
 
 #创建eventdetail表
-sql2='''create table eventdetail(
+sql2='''create table eventdetaill(
 抽取编号               text ,
  警情编号           text ,
  接警编号                text ,
@@ -445,11 +444,13 @@ sql2='''create table eventdetail(
  经度                    text,
  纬度                    text ,
  是否审核                text,
- 核警时间                text ,
+ 核警时间                text 
         );'''
  
 
+cur1.execute(sql)
 cur1.execute(sql1)
+cur1.execute(sql2)
 print("创建成功")
 
 conn1.commit()
@@ -458,11 +459,121 @@ conn1.close()
 
 
 #数据2 存至本地
+#全提取建表_存至本地
+import psycopg2
+import csv
+#连接数据库
+conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="58955X", host="132.1.11.157", port="5432")
+conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
 
 
+print("Opened database successfully")
+
+#数据游标
+cur = conn.cursor()
+cur1 = conn1.cursor()
+
+#select操作 
+cur.execute("select * from incident."'警情信息表'"")#空值为none,替换成null
+rows = cur.fetchall()
+for row in rows:   
+    sql1="insert into policein_a values"+str(row).replace('None','null')
+    #print(sql1)
+    cur1.execute(sql1)
+conn1.commit()#提交运行结果
+print("插入成功")
+
+cur.close()
+cur1.close()
+conn.close()
+conn1.close()
+
+#问题：查询内存不足
+Traceback (most recent call last):
+  File "C:/data/4.py", line 15, in <module>
+    cur.execute("select * from incident."'警情表'"")#空值为none,替换成null
+psycopg2.DatabaseError: out of memory for query result
+
+----limit +偏移 查询  偏移到一定量，返回结果数量为0
+import psycopg2
+import csv
+#连接数据库
+conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="58955X", host="132.1.11.157", port="5432")
+conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
 
 
+print("Opened database successfully")
 
+#数据游标
+cur = conn.cursor()
+cur1 = conn1.cursor()
+#循环获取数据
+i=0
+while( 1):
+    sql="select * from incident."'警情表'" limit 1000 offset " + str(1000*i)
+    i=i+1
+    print(sql)
+    cur.execute(sql)
+    rows=cur.fetchall()
+    if(len(rows)>0):
+        for row in rows:
+           sql1="insert into policein_b values" + str(row).replace('None','null')
+           cur1.execute(sql1)
+    else:
+        break
+conn1.commit()#提交运行结果
+print("插入成功")
+
+cur.close()
+cur1.close()
+conn.close()
+conn1.close()
+ 
+----select * from textanalysis.eventdetail320500_0520 limit 5000 offset 3680000
+Traceback (most recent call last):
+  File "C:/data/6.py", line 24, in <module>
+    cur1.execute(sql1)
+psycopg2.errors.OutOfMemory: 错误:  内存用尽
+DETAIL:  无法请求大小 40.
+
+-----分段插，先插3500000条
+ import psycopg2
+import csv
+#连接数据库
+conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="589555", host="132.1.11.157", port="5432")
+conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+
+
+print("Opened database successfully")
+
+#数据游标
+cur = conn.cursor()
+cur1 = conn1.cursor()
+#循环获取数据
+i=0
+while( 1):
+    sql="select * from textanalysis.eventdetail320500_0520 limit 5000 offset " + str(5000*i+3500000)
+    i=i+1
+    
+    cur.execute(sql)
+    rows=cur.fetchall()
+    if(len(rows)>0):
+        for row in rows:
+           sql1="insert into eventdetail values" + str(row).replace('None','null')
+           cur1.execute(sql1)
+    else:
+        break
+conn1.commit()#提交运行结果
+print("i:"+str(i))
+print("插入成功")
+
+cur.close()
+cur1.close()
+conn.close()
+conn1.close()
+   
+
+——————backup && restore
 
 
 
