@@ -26,7 +26,7 @@
   5) Python插入数据
    import psycopg2
    #连接数据库
-   conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="589555", host="132.1.11.157", port="5432")
+   conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="58955X", host="132.1.11.157", port="5432")
    conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
    print("Opened database successfully")
 
@@ -57,9 +57,468 @@
  
  
  
- 
- 
+数据2
+1）数据类型——警情信息表、警情表、eventdetail.     pgadmin本地建表
+
+crimeanalysis=> \d incident."警情信息表"
+ sid              | character(32)               |           |          |
+ 警情状态         | smallint                    |           |          |
+ 行政区划代码     | character(12)               |           |          |
+ 行政区划名称     | character varying(128)      |           |          |
+ 接警单号         | character varying(40)       |           |          |
+ 接警情况         | common.udt_response         |           |          |
+ 接警警情         | common.udt_police_record    |           |          |
+ 接警备注         | character varying(256)      |           |          |
+ 接警更新标识     | character(6)                |           |          |
+ 接警最后更新时间 | timestamp without time zone |           |          |
+ 处警单号         | character varying(40)       |           |          |
+ 处警情况         | common.udt_response         |           |          |
+ 处警意见         | character varying(256)      |           |          |
+ 处警意见标签     | character varying(64)[]     |           |          |
+ 处警更新标识     | character(6)                |           |          |
+ 处警最后更新时间 | timestamp without time zone |           |          |
+ 反馈单号         | character varying(40)       |           |          |
+ 出警情况         | common.udt_response         |           |          |
+ 出警警情         | common.udt_police_record    |           |          |
+ 处理结果代码     | character(6)                |           |          |
+ 处理结果描述     | character varying(2000)     |           |          |
+ 损失情况描述     | character varying(2000)     |           |          |
+ 反馈更新标识     | character(6)                |           |          |
+ 反馈最后更新时间 | timestamp without time zone |           |          |
+ 核警单号         | character varying(40)       |           |          |
+ 核警情况         | common.udt_response         |           |          |
+ 核警警情         | common.udt_police_record    |           |          |
+ 研判情况描述     | character varying(512)      |           |          |
+ 研判情况标签     | character varying[]         |           |          |
+ 核警更新标识     | character(6)                |           |          |
+ 核警最后更新时间 | timestamp without time zone |           |          |
+
+  crimeanalysis=> \d incident."警情表"
+                            数据表 "incident.警情表"
+        栏位        |           类型           | Collation | Nullable | Default
+--------------------+--------------------------+-----------+----------+---------
+ 系统编号           | character(36)            |           | not null |
+ 警情状态           | integer                  |           |          |
+ 行政区划代码       | character(6)             |           |          |
+ 行政区划名称       | character varying(128)   |           |          |
+ 接警单编号         | character varying(40)    |           |          |
+ 接警单位代码       | character varying(32)    |           |          |
+ 接警单位名称       | character varying(128)   |           |          |
+ 报警时间           | character varying(14)    |           |          |
+ 接警时间           | character varying(14)    |           |          |
+ 接警完成时间       | character varying(14)    |           |          |
+ 报警方式           | character(2)             |           |          |
+ 报警内容标签集     | json                     |           |          |
+ 报警内容           | character varying(2000)  |           |          |
+ 报警地址           | character varying(256)   |           |          |
+ 报警地理位置       | geography(Point,4326)    |           |          |
+ 报警涉人信息标签   | json                     |           |          |
+ 报警涉人信息详情   | character varying(2000)  |           |          |
+ 报警涉车信息标签   | json                     |           |          |
+ 报警涉车信息详情   | character varying(2000)  |           |          |
+ 报警涉物信息标签   | json                     |           |          |
+ 报警涉物信息详情   | character varying(2000)  |           |          |
+ 报警涉财信息标签   | json                     |           |          |
+ 报警涉财信息详情   | character varying(2000)  |           |          |
+ 报警人             | json                     |           |          |
+ 报警电话           | json                     |           |          |
+ 接警类型           | character(2)             |           |          |
+ 警情分类代码(接警) | character varying(6)     |           |          |
+ 警情类型代码(接警) | character varying(6)     |           |          |
+ 警情细类代码(接警) | character varying(6)     |           |          |
+ 接警备注           | character varying(128)   |           |          |
+ 接警人员           | character varying(128)   |           |          |
+ 接警更新标识       | character(6)             |           |          |
+ 接警最后更新时间   | timestamp with time zone |           |          |
+ 处警单编号         | character varying(40)    |           |          |
+ 处警单位代码       | character varying(32)    |           |          |
+ 处警单位名称       | character varying(128)   |           |          |
+ 处警时间           | character varying(14)    |           |          |
+ 出警单位代码       | character varying(32)    |           |          |
+ 出警单位名称       | character varying(128)   |           |          |
+ 接单时间           | character varying(14)    |           |          |
+ 处警意见标签       | json                     |           |          |
+ 处警意见内容       | character varying(2000)  |           |          |
+ 出警人员           | json                     |           |          |
+ 出警车辆           | json                     |           |          |
+ 处警备注           | character varying(128)   |           |          |
+ 处警人员           | character varying(200)   |           |          |
+ 处警更新标识       | character(6)             |           |          |
+ 处警最后更新时间   | timestamp with time zone |           |          |
+ 反馈单编号         | character varying(40)    |           |          |
+ 反馈单位代码       | character varying(32)    |           |          |
+ 反馈单位名称       | character varying(128)   |           |          |
+ 接单时间(同上)     | character varying(14)    |           |          |
+ 出警时间           | character varying(14)    |           |          |
+ 到达时间           | character varying(14)    |           |          |
+ 反馈时间           | character varying(14)    |           |          |
+ 天气情况           | json                     |           |          |
+ 警情分类代码(出警) | character varying(6)     |           |          |
+ 警情类型代码(出警) | character varying(6)     |           |          |
+ 警情细类代码(出警) | character varying(6)     |           |          |
+ 警情关注类别(出警) | character varying(32)    |           |          |
+ 处警情况标签       | json                     |           |          |
+ 出警情况           | character varying(2000)  |           |          |
+ 出警人员情况       | json                     |           |          |
+ 出警车辆情况       | json                     |           |          |
+ 事发时间           | json                     |           |          |
+ 事发地址           | json                     |           |          |
+ 事发地理位置       | geography(Point,4326)    |           |          |
+ 事发场所信息标签   | json                     |           |          |
+ 事发场所信息详情   | json                     |           |          |
+ 事发涉人信息标签   | json                     |           |          |
+ 事发涉人信息详情   | json                     |           |          |
+ 事发涉车信息标签   | json                     |           |          |
+ 事发涉车信息详情   | json                     |           |          |
+ 事发涉物信息标签   | json                     |           |          |
+ 事发涉物信息详情   | json                     |           |          |
+ 事发涉财信息标签   | json                     |           |          |
+ 事发涉财信息详情   | json                     |           |          |
+ 事发周边信息标签   | json                     |           |          |
+ 事发周边信息详情   | json                     |           |          |
+ 处理结果代码       | character varying(6)     |           |          |
+ 处理结果描述       | character varying(2000)  |           |          |
+ 损失情况描述       | character varying(2000)  |           |          |
+ 反馈备注           | character varying(128)   |           |          |
+ 反馈人员           | character varying(128)   |           |          |
+ 反馈更新标识       | character(6)             |           |          |
+ 反馈最后更新时间   | timestamp with time zone |           |          |
+ 核警单编号         | character varying(40)    |           |          |
+ 核警单位代码       | character varying(32)    |           |          |
+ 核警单位名称       | character varying(128)   |           |          |
+ 核警时间           | character varying(14)    |           |          |
+ 警情分类代码(核警) | character varying(6)     |           |          |
+ 警情类型代码(核警) | character varying(6)     |           |          |
+ 警情细类代码(核警) | character varying(6)     |           |          |
+ 警情关注类别(核警) | character varying(32)    |           |          |
+ 核警地址           | json                     |           |          |
+ 核警地理位置       | geography(Point,4326)    |           |          |
+ 警情描述标签       | json                     |           |          |
+ 警情描述           | json                     |           |          |
+ 警情时间标签       | json                     |           |          |
+ 警情时间描述       | json                     |           |          |
+ 报警人信息标签     | json                     |           |          |
+ 报警人信息详情     | json                     |           |          |
+ 受害人信息标签     | json                     |           |          |
+ 受害人信息详情     | json                     |           |          |
+ 嫌疑人信息标签     | json                     |           |          |
+ 嫌疑人信息详情     | json                     |           |          |
+ 嫌疑车辆信息标签   | json                     |           |          |
+ 嫌疑车辆信息详情   | json                     |           |          |
+ 事发地点标签       | json                     |           |          |
+ 事发地点详情       | json                     |           |          |
+ 周边情况标签       | json                     |           |          |
+ 周边情况详情       | json                     |           |          |
+ 涉案物品标签       | json                     |           |          |
+ 涉案物品详情       | json                     |           |          |
+ 涉案通讯标签       | json                     |           |          |
+ 涉案通讯详情       | json                     |           |          |
+ 涉案金额标签       | json                     |           |          |
+ 涉案金额详情       | json                     |           |          |
+ 涉案手段标签       | json                     |           |          |
+ 涉案手段详情       | json                     |           |          |
+ 涉案部位标签       | json                     |           |          |
+ 涉案部位详情       | json                     |           |          |
+ 研判情况标签       | json                     |           |          |
+ 研判情况           | json                     |           |          |
+ 核警备注           | character varying(128)   |           |          |
+ 核警人员           | character varying(128)   |           |          |
+ 核警更新标识       | character(6)             |           |          |
+ 核警最后更新时间   | timestamp with time zone |           |          |
+索引：
+    "pk_jingqing" PRIMARY KEY, btree ("系统编号")
+    "uk_jingqing" UNIQUE CONSTRAINT, btree ("接警单编号", "处警单编号", "反馈单编号", "核警单编号")
   
-  
+
+crimeanalysis=> \d textanalysis.eventdetail320500_0520
+          数据表 "textanalysis.eventdetail320500_0520"
+          栏位          | 类型 | Collation | Nullable | Default
+------------------------+------+-----------+----------+---------
+ 抽取编号               | text |           |          |
+ 警情编号               | text |           |          |
+ 接警编号               | text |           |          |
+ 接警单编号             | text |           |          |
+ 接警时间               | text |           |          |
+ 报警方式               | text |           |          |
+ 处警编号               | text |           |          |
+ 处警时间               | text |           |          |
+ 处警单位               | text |           |          |
+ 发案详址               | text |           |          |
+ 报警位置               | text |           |          |
+ 报警内容               | text |           |          |
+ 处警内容               | text |           |          |
+ 反馈内容               | text |           |          |
+ 接警类别编码           | text |           |          |
+ 接警类别               | text |           |          |
+ 报警电话               | text |           |          |
+ 天气情况编码           | text |           |          |
+ 天气情况               | text |           |          |
+ 事发场所编码           | text |           |          |
+ 事发场所               | text |           |          |
+ 事发时间上限           | text |           |          |
+ 事发时间下限           | text |           |          |
+ 处警类别编码           | text |           |          |
+ 处警类别               | text |           |          |
+ 处警大类编码           | text |           |          |
+ 处警大类               | text |           |          |
+ 处警中类编码           | text |           |          |
+ 处警中类               | text |           |          |
+ 处警小类编码           | text |           |          |
+ 处警小类               | text |           |          |
+ 所属分局编码           | text |           |          |
+ 所属分局               | text |           |          |
+ 所属派出所编码         | text |           |          |
+ 所属派出所             | text |           |          |
+ 物品编码               | text |           |          |
+ 物品                   | text |           |          |
+ 处警结果               | text |           |          |
+ 受害人性别             | text |           |          |
+ 年龄                   | text |           |          |
+ 户籍类型编码           | text |           |          |
+ 户籍类型               | text |           |          |
+ 处所编码               | text |           |          |
+ 处所                   | text |           |          |
+ 手段编码               | text |           |          |
+ 手段                   | text |           |          |
+ 发案简址               | text |           |          |
+ 简要案情               | text |           |          |
+ 单位编码               | text |           |          |
+ 单位                   | text |           |          |
+ 类别编码               | text |           |          |
+ 类别                   | text |           |          |
+ 自定义大类编码         | text |           |          |
+ 自定义大类             | text |           |          |
+ 自定义中类编码         | text |           |          |
+ 自定义中类             | text |           |          |
+ 自定义小类编码         | text |           |          |
+ 自定义小类             | text |           |          |
+ 处所细类1编码          | text |           |          |
+ 处所细类1              | text |           |          |
+ 处所细类2编码          | text |           |          |
+ 处所细类2              | text |           |          |
+ 部位细类2编码          | text |           |          |
+ 部位细类2              | text |           |          |
+ 手段细类编码           | text |           |          |
+ 手段细类               | text |           |          |
+ 自定义类型1编码        | text |           |          |
+ 自定义类型1            | text |           |          |
+ 自定义类型2编码        | text |           |          |
+ 自定义类型2            | text |           |          |
+ 汇款银行名称           | text |           |          |
+ 汇款银行地点           | text |           |          |
+ 涉案金额               | text |           |          |
+ 汇转方式编码           | text |           |          |
+ 汇转方式               | text |           |          |
+ 嫌疑人车情况           | text |           |          |
+ 受害人                 | text |           |          |
+ 抓获人数               | text |           |          |
+ 时段                   | text |           |          |
+ 回访情况               | text |           |          |
+ 监控情况               | text |           |          |
+ 品牌                   | text |           |          |
+ 车型                   | text |           |          |
+ 备注                   | text |           |          |
+ 单位商店名称           | text |           |          |
+ 是否大额标记           | text |           |          |
+ 涉案qq号               | text |           |          |
+ 银行类型编码           | text |           |          |
+ 涉案银行类型           | text |           |          |
+ 嫌疑手机号             | text |           |          |
+ 嫌疑账号               | text |           |          |
+ 警情内容               | text |           |          |
+ 所属社区编码           | text |           |          |
+ 所属社区               | text |           |          |
+ 所属责任区编码         | text |           |          |
+ 所属责任区             | text |           |          |
+ 物品中有无手机         | text |           |          |
+ 物品有无电脑           | text |           |          |
+ 标准地址编码           | text |           |          |
+ 标准地址名称           | text |           |          |
+ 街路巷编码             | text |           |          |
+ 街路巷名称             | text |           |          |
+ 处理结果               | text |           |          |
+ 违法犯罪关注类警情类别 | text |           |          |
+ 违法犯罪警情大类       | text |           |          |
+ 日期                   | text |           |          |
+ 研判时间               | text |           |          |
+ 研判周                 | text |           |          |
+ 研判月                 | text |           |          |
+ 状态                   | text |           |          |
+ 是否完成               | text |           |          |
+ 是否同步               | text |           |          |
+ 抽取人警号             | text |           |          |
+ 抽取人                 | text |           |          |
+ 抽取时间               | text |           |          |
+ 抽取单位编码           | text |           |          |
+ 抽取单位               | text |           |          |
+ 经度                   | text |           |          |
+ 纬度                   | text |           |          |
+ specialkey             | text |           |          |
+ 是否审核               | text |           |          |
+ 任务标签               | text |           |          |
+ 类型                   | text |           |          |
+ 类型编码               | text |           |          |
+ 核警物品编码           | text |           |          |
+ 核警物品               | text |           |          |
+ 汇款银行编码           | text |           |          |
+ 监控有无人像           | text |           |          |
+ 手段细类2编码          | text |           |          |
+ 手段细类2              | text |           |          |
+ 评估时间               | text |           |          |
+ 评估人账号             | text |           |          |
+ 核警时间               | text |           |          |
+ 所属片区编码           | text |           |          |
+ 所属片区               | text |           |          |
+ 首次评估时间           | text |           |          |
+ 是否超时               | text |           |          |
+ 
+Python代码：提取有效字段建表
+#创建表
+import psycopg2
+#连接数据库
+conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+print("Opened database successfully")
+
+#数据游标
+cur1 = conn1.cursor()
+#创建警情信息表
+sql = '''create table policein_a (
+        sid               character(32) ,                   
+         接警单号          character varying(40),      
+         接警情况          text,         
+         接警警情          text,    
+         处警单号          character varying(40),       
+         处警情况          text,         
+         处警意见          character varying(256),          
+         出警情况          text,         
+         出警警情          text,                                                   
+ ;'''
+
+#创建警情表
+sql1='''create table policein_b (
+ 系统编号            character(36)            primary key          not null ,
+ 接警单编号          character varying(40)    unique,
+ 接警单位代码        character varying(32)    ,
+ 接警单位名称        character varying(128)  ,
+ 接警时间            character varying(14)    ,
+ 报警内容            character varying(2000)  ,
+ 报警地址            character varying(256)  ,
+ 报警地理位置        geography(Point,4326)   ,
+ 损失情况描述        character varying(2000) ,
+ 警情关注类别_核警  character varying(32)  );
+
+'''
+
+
+#创建eventdetail表
+sql2='''create table eventdetail(
+抽取编号               text ,
+ 警情编号           text ,
+ 接警编号                text ,
+ 接警单编号              text ,
+ 接警时间                text ,
+ 发案详址                text ,
+ 报警位置                text ,
+ 报警内容                text ,
+ 接警类别编码            text ,
+ 接警类别                text ,
+ 报警电话                text ,
+ 事发时间上限            text ,
+ 事发时间下限            text ,
+ 处警类别编码            text ,
+ 处警类别                text ,
+ 处警大类编码            text ,
+ 处警大类                text,
+ 处警中类编码            text ,
+ 处警中类               text ,
+ 处警小类编码            text ,
+ 处警小类                text ,
+ 所属分局编码            text ,
+ 所属分局                text,
+ 所属派出所编码          text ,
+ 所属派出所              text ,
+ 时段                    text,
+ 所属社区编码            text ,
+ 所属社区                text ,
+ 所属责任区编码          text ,
+ 所属责任区              text ,
+ 经度                    text,
+ 纬度                    text ,
+ 是否审核                text,
+ 核警时间                text ,
+        );'''
+ 
+
+cur1.execute(sql1)
+print("创建成功")
+
+conn1.commit()
+cur1.close()
+conn1.close()
+
+
+#数据2 存至本地
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
