@@ -576,6 +576,57 @@ conn1.close()
 ——————backup && restore
 
 
+派出所数据——拉至本地
+1)查看原始表数据类型
+crimeanalysis=> \d common.警务辖区
+                           数据表 "common.警务辖区"
+     栏位     |             类型             | Collation | Nullable | Default
+--------------+------------------------------+-----------+----------+---------
+ 辖区编号     | character varying(32)        |           |          |
+ 辖区名称     | character varying(128)       |           |          |
+ 行政区划代码 | character(6)                 |           |          |
+ 行政区划名称 | character varying(128)       |           |          |
+ 辖区类别     | character varying(16)        |           |          |
+ 机构地址     | json                         |           |          |
+ 机构位置     | geography(Point,4326)        |           |          |
+ 标注位置     | geography(Point,4326)        |           |          |
+ 地理范围     | geography(MultiPolygon,4326) |           |          |
+ 备注         | character varying(128)       |           |          |
+1）创建本地表
+postgres=# create extension postgis;
+错误:  扩展 "postgis" 已经存在
+postgres=# create table police_info (police_id  character varying(32) ,police_name  character varying(128), scope  geography(MultiPolygon,4326));
+CREATE TABLE
+postgres=#
+
+
+2) Python插入数据
+   import psycopg2
+   #连接数据库
+   conn = psycopg2.connect(database="crimeanalysis", user="crimeanalysis", password="589555", host="132.1.11.157", port="5432")
+   conn1 = psycopg2.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+   print("Opened database successfully")
+
+   #数据游标
+   cur = conn.cursor()
+   cur1 = conn1.cursor()
+
+   #select操作
+   sql = '''select  辖区编号,辖区名称,地理范围 from common.警务辖区'''
+   cur.execute(sql)
+   rows = cur.fetchall()
+   for row in rows:   
+      sql1="insert into police_info values"+str(row)
+      #print(sql1)
+      cur1.execute(sql1)
+   conn1.commit()#提交运行结果
+   print("插入成功")
+   cur.close()
+   cur1.close()
+   conn.close()
+   conn1.close()
+ 6)backup 备份至本地————以便传入另一个桌面的本地数据库 Custom UTF8
+ 7）本地restore :  create extension postgis;安装空间数据库拓展 ，restore .backup 🆗
 
 
 
