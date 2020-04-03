@@ -68,11 +68,106 @@
         conn.close()
 3  table_b与table_d的名称/编号统一
    1）table_b筛选出同一名称但编号不同的派出所，查看位置：若位置相同——将编号统一
-     机理 02、03、04、08、99 等更新了名称或编号
+     机理 02、03、04、08、99 等更新了名称或编号，2013年改名/编号
      将其统一至table_d 即后来的编号
-   
    2）table_d与table_b同一名称但编号不同的筛选，查看位置：若位置相同——将编号统一至table_d
-              
+   #step 1 : table_b  编号更新
+      import psycopg2 as pg
+
+      #待更新数据
+      data_dic = {'白洋湾派出所':'320508700000','彩香派出所':'320508670000','沧浪派出所':'320508610000','南门派出所':'320508610000','葑门派出所':'320508600000','公园派出所':'320508580000','观前派出所':'320508540000','虎丘派出所':'320508690000','金阊派出所':'320508670000','留园派出所':'320508660000','娄门派出所':'320508530000','皮市街派出所':'320508520000','平江路派出所':'320508510000','平江派出所':'320508510000','山塘派出所':'320508680000','石路派出所':'320508650000','双塔派出所':'320508590000','苏锦派出所':'320508560000','桃花坞派出所':'320508570000','吴门桥派出所':'320508620000','胥江派出所':'320508640000','友新派出所':'320508630000'}
+      #城北派出所 320503580000->320508550000;彩香派出所改名：金阊派出所；平江路派出所改名平江派出所；南门派出所改名为沧浪派出所
+      #连接数据库
+      conn = pg.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+      print("Opened database successfully")
+      cur = conn.cursor()
+
+      #更新数据库
+      # for i in data_dic:
+      #     sql_i = "update table_b set 接警单位代码 = '" +data_dic[i] + "' where 接警单位名称 = '" + i+"'"
+      #     print(sql_i)
+      #     cur.execute(sql_i)
+      # print("更新成功")  
+      # conn.commit()
+
+      #改名
+      # sql_1 = "update table_b set 接警单位名称 = '金阊派出所' where  接警单位代码 = '320508670000'"
+      # sql_2 = "update table_b set 接警单位名称 = '平江派出所' where  接警单位代码 = '320508510000'"
+      # sql_3 = "update table_b set 接警单位代码 = '320508550000' where  接警单位代码 = '320503580000'"
+      # sql_4 = "update table_b set 接警单位名称 = '沧浪派出所' where  接警单位代码 = '320508610000'"
+      # cur.execute(sql_1)
+      # cur.execute(sql_2)
+      # cur.execute(sql_3)
+      # cur.execute(sql_4)
+      # print("更新成功")  
+      # conn.commit()
+
+      #与table_d相比 名称和编号更新
+      #320507510000->澄阳派出所；永安桥派出所->320594610000
+      sql_5 = "update table_b set 接警单位名称 = '澄阳派出所' where  接警单位代码 = '320507510000'"
+      sql_6 = "update table_b set 接警单位代码 = '320594610000' where  接警单位名称 = '永安桥派出所'"
+      cur.execute(sql_5)
+      cur.execute(sql_6)
+      print("更新成功")  
+      conn.commit()
+
+
+      cur.close()
+      conn.close()
+4 分区
+1 派出所代码->区：
+  参考：苏州公安局 微信公众号/苏州本地宝/中国警察网
+   3205代表苏州 后两位代表区
+   table_b :  08、99  姑苏
+              05                 高新
+              06                 吴中
+              07                 相城
+              81                 常熟
+              84                 吴江
+              93                 度假区
+              94                 园区
+   table_d:   05                 高新
+              06                 吴中
+              07                 相城
+              08                 姑苏
+              81                 常熟
+              82                 张家港
+              83                 昆山
+              84                 吴江
+              85                 太仓
+              93                 度假区
+              94                 园区
+ 1）新建字段
+ 新增列字段：
+    postgres=# ALTER TABLE table_b ADD district  character varying(128) ;
+    ALTER TABLE
+    postgres=# ALTER TABLE table_d ADD district  character varying(128) ;
+    ALTER TABLE
+    postgres=#
+ 2)分区
+     # step 1 ：分区
+    import psycopg2 as pg
+
+    #区数据
+    data_dic = {'08':'姑苏','99':'姑苏','05':'高新','06':'吴中','07':'相城','81':'常熟','82':'张家港','83':'昆山','84':'吴江','85':'太仓','93':'度假区','94':'园区'}
+
+    #连接数据库
+    conn = pg.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+    print("Opened database successfully")
+    cur = conn.cursor()
+    #插入数据
+    for i in data_dic:
+        sql_i_1 = "update table_b set district = '" +data_dic[i] + "' where 接警单位代码 like '3205" + i+"%'"
+        sql_i_2 = "update table_d set district = '" +data_dic[i] + "' where 所属派出所编码 like '3205" + i+"%'"
+        cur.execute(sql_i_1)
+        cur.execute(sql_i_2)
+
+    print("更新成功")  
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
               
               
               
