@@ -1,0 +1,76 @@
+
+
+
+
+——————————算法的实现——————————
+
+一 周期现象的研究——————————好难啊！！！！
+  1. 以天为统计单位——分析周期
+  
+  2. 选取最小周期的天数——分析以小时为统计单位的周期
+  
+二 间隔时间分布
+1. 计算记忆性指标和阵发性指标
+
+# 间隔时间序列的标准差和平均值计算
+# 阵发性指标计算
+
+import psycopg2 as pg
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import matplotlib
+import time
+matplotlib.rcParams['font.size'] = 0.8
+#%%
+#获取时间，将时间换成时间戳 
+#各事件时间与201201010000时间差作为相对时间
+
+#连接数据库 获取数据
+conn = pg.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+print("Opened database successfully")
+
+#取至分钟位
+sql = "select overlay( 接警时间 placing '00' from 13 for 14) from table_b where 接警时间 like '2012%'  order by 接警时间 "
+
+#sql = "select  接警时间 as overlay from table_b where 接警时间 like '2012%'  order by 接警时间 "
+data = pd.read_sql(sql, conn)
+print("get data successfully")
+
+
+#%%
+#时间序列计算
+time = pd.to_datetime(data.overlay,format="%Y%m%d%H%M%S")
+
+dt = (time.values - np.datetime64('2012-01-01T00:00:00Z')) / np.timedelta64(1, 'm')
+dtf = pd.DataFrame(dt)#时间序列
+
+#%%
+#时间间隔时间计算
+interval  = dtf
+interval.columns = ['interval']
+interval = interval.diff()
+interval = interval.fillna(0)#间隔时间序列
+
+#%%
+#平均值
+mean = interval ['interval'].mean()
+#标准差
+std = interval ['interval'].std()
+#阵发性指标计算
+B = (std-mean)/(std+mean)
+print(mean,std,B)
+
+#%%
+#记忆性指标计算
+l_1 = interval[1:].T.values
+l_2 = interval[:-1].T.values
+m1 = l_1.mean()
+m2 = l_2.mean()
+std1 = l_1.std()
+std2 = l_2.std()
+sum_t = (l_1 - m1)*(l_2 - m2)/(std1*std2)
+M = sum_t.sum()/sum_t.size
+
+print(M)
+
