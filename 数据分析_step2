@@ -5,7 +5,87 @@
 ——————————算法的实现——————————
 
 一 周期现象的研究——————————好难啊！！！！
-  1. 以天为统计单位——分析周期
+#相差的天数
+select to_timestamp(接警时间,'yyyymmddhh24miss')-to_timestamp('20120101000000','yyyymmddhh24miss')
+from table_b;     
+
+  1. 以天为统计单位——分析周期/以小时为单位分析周期 
+  1）sql  数据库新增字段 _day，_hour  字段截取
+  #更新小时
+  update table_b set _hour = substr(接警时间,0,11)
+  更新天
+  update table_b set _day = substr(接警时间,0,9)
+  2）group by _day/_hour ,统计每一天/小时的总数
+  #小时
+  select _hour, count(*) from table_b group by _hour;
+  #天
+  select _day, count(*) from table_b group by _day;
+  
+  
+  
+  ???3）Python获取每一天/小时的统计值，每一天-初始日期——————>第几天，每一小时-初始小时————>第几小时
+  ????4）得：x:时间，y:数量
+  ???? xxx天有缺省值——————
+  2.给定日期，数据库查询，返回查询结果
+  1）创建一个所有时间格式的 中间表 ：通过函数 generate_series （）
+   SELECT
+    to_char ( b, 'yyyymmdd') AS time
+    FROM
+    generate_series ( to_timestamp ( '20120101', 'yyyymmdd' ), to_timestamp ( '20131031', 'yyyymmdd' ), '1 days' ) AS b
+    GROUP BY
+    time ORDER BY time asc
+    
+    然后在和需要查询的 数据 连表查
+
+#sql如下：day
+
+SELECT a.time,COALESCE(b.counts,0) as counts from
+(
+ SELECT
+    to_char ( b, 'yyyymmdd') AS time
+    FROM
+    generate_series ( to_timestamp ( '20120101', 'yyyymmdd' ), to_timestamp ( '20131031', 'yyyymmdd' ), '1 days' ) AS b
+    GROUP BY
+    time ORDER BY time asc
+
+) as a
+
+FULL OUTER JOIN
+
+(
+ select _day, count(*) as counts from table_b group by _day
+) as b
+
+on a.time=b._day
+order by a.time asc
+
+
+#sql如下：hour
+
+SELECT a.time,COALESCE(b.counts,0) as counts from
+(
+ SELECT
+    to_char ( b, 'yyyymmddhh24') AS time
+    FROM
+    generate_series ( to_timestamp ( '2012010100', 'yyyymmddhh24' ), to_timestamp ( '2013103123', 'yyyymmddhh24' ), '1 hour' ) AS b
+    GROUP BY
+    time ORDER BY time asc
+
+) as a
+
+FULL OUTER JOIN
+
+(
+ select _hour, count(*) as counts from table_b group by _hour
+) as b
+
+on a.time=b._hour
+order by a.time asc
+
+###Python获取day的时间序列
+  
+  
+  
   
   2. 选取最小周期的天数——分析以小时为统计单位的周期
   
