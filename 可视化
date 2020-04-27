@@ -1,0 +1,22 @@
+Matplotlib
+https://zhuanlan.zhihu.com/p/93423829
+figure 画布
+axes 画布上的对象
+
+ax.set_title('Title',fontsize=18)
+ax.set_xlabel('xlabel', fontsize=18,fontfamily = 'sans-serif',fontstyle='italic')
+ax.set_ylabel('ylabel', fontsize='x-large',fontstyle='oblique')
+ax.legend()
+
+然后是xy坐标轴的一些属性设定, 也是在axes level上完成的
+
+ax.set_aspect('equal') 
+ax.minorticks_on() 
+ax.set_xlim(0,16) 
+ax.grid(which='minor', axis='both')
+最后是坐标轴tick和细节，这个在axes.xaxis or axes.yaxis上完成。
+
+ax.xaxis.set_tick_params(rotation=45,labelsize=18,colors='w') 
+start, end = ax.get_xlim() 
+ax.xaxis.set_ticks(np.arange(start, end,1)) 
+ax.yaxis.tick_right()
