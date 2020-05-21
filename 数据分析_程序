@@ -1,0 +1,213 @@
+一.间隔时间分布事件序列图
+
+eventplot('table_b','h',num=500,possion=True) #前500件
+'''
+事件序列图——与同规模下的泊松分布事件序列对比
+参数：
+data_set:存数据的表名----table_b/table_d
+time_unit:时间单位,m/h/d
+district:区,默认为none
+police_s:派出所,默认为none
+num:数量,默认为none
+possion:是否画同规模下的泊松分布事件图,默认为False
+'''
+def eventplot(data_set,time_unit,district = None,police_s = None,num = None,possion = False):
+        #连接数据库 获取数据
+    conn = pg.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+    print("Opened database successfully")
+    #地区
+    if district == None and police_s == None:
+        loc_info = ''
+    elif district !=None:
+        loc_info = ' where district ='+district
+    else:
+        loc_info = ' where 接警单位名称 = '+police_s
+
+    #数量
+    if num == None:
+        limitN = ""
+    else:
+        limitN = ' limit ' +str(num)
+
+
+    #单位
+    if time_unit == 'm':
+        #取至分钟位
+        sql = "select overlay( 接警时间 placing '00' from 13 for 14) from "+data_set+loc_info+" order by 接警时间 "+limitN
+    if time_unit == 'h':
+        #取至小时位
+        sql =  "select overlay( 接警时间 placing '0000' from 11 for 14) from "+data_set+loc_info+" order by 接警时间"+limitN
+    if time_unit == 'd':
+        #取至天
+        sql = "select overlay( 接警时间 placing '000000' from 9 for 14) from "+data_set+loc_info+" order by 接警时间"+limitN
+        #sql = "select  接警时间 as overlay from table_b where 接警时间 like '2012%'  order by 接警时间 "
+    
+    data = pd.read_sql(sql, conn)
+    #时间序列计算
+    time = pd.to_datetime(data.overlay,format="%Y%m%d%H%M%S")
+    dt = (time.values - np.datetime64(time.values[0])) / np.timedelta64(1, time_unit)
+    
+
+    #创建画布
+    fig = plt.figure(dpi = 100)
+        #创建对象
+    ax = fig.add_subplot(221)
+    #自动缩放
+    ax.set_autoscalex_on(True)
+    #x轴标题
+    text = 't('+str(time_unit)+')'
+    ax.set_xlabel(text)
+    #x轴刻度不可见
+    ax.get_xaxis().set_visible(False)
+    #y轴刻度不可见
+    ax.get_yaxis().set_visible(False)
+    
+    #eventplot
+    ax.eventplot(dt,colors='black',linewidths=0.5)
+    ax.spines['bottom'].set_position(('data',0.5))#x轴位置
+    ax.spines['top'].set_position(('data',1.5))
+    ax.spines['left'].set_color('none')#设置左右颜色为空
+    ax.spines['right'].set_color('none')
+    
+    #做泊松分布
+    if possion ==True:
+        pdata = np.random.poisson(lam=1,size=num)
+        D=pd.Series(pdata)
+        pdata = D.cumsum() 
+
+        ax_1 = fig.add_subplot(222)
+        ax_1.set_autoscalex_on(True)
+        #x轴标题
+        text_ = 't('+str(time_unit)+')'
+        ax_1.set_xlabel(text_)
+        #x轴刻度不可见
+        ax_1.get_xaxis().set_visible(False)
+        #y轴刻度不可见
+        ax_1.get_yaxis().set_visible(False)
+        
+        #eventplot
+        ax_1.eventplot(pdata,colors='black',linewidths=0.5)
+        ax_1.spines['bottom'].set_position(('data',0.5))#x轴位置
+        ax_1.spines['top'].set_position(('data',1.5))
+        ax_1.spines['left'].set_color('none')#设置左右颜色为空
+        ax_1.spines['right'].set_color('none')
+    plt.show()
+
+
+二 .对研究区2012年1月1日至2013年10月31日期间所有入室盗窃行为发生的时间间隔进行计算。绘制时间间隔分布概率分布图
+#间隔时间序列
+interval_t = calculate.get_interval_t('table_b','20120101000000','20131101000000','m')
+'''
+获取数据_间隔时间序列
+参数：
+data_set:存数据的表名----table_b/table_d
+start_time:开始时间 ,不全补0
+end_time:结束时间，不全补0
+time_unit:时间单位,m/h/d
+district:区,默认为none
+police_s:派出所,默认为none
+
+返回值:
+间隔时间序列,interval_t,格式np.array
+'''
+def get_interval_t(data_set,start_time,end_time,time_unit,district = None,police_s = None):
+    #连接数据库 获取数据
+    conn = pg.connect(database="postgres", user="postgres", password="zhangjie1234", host="127.0.0.1", port="5432")
+    print("Opened database successfully")
+
+    if district == None and police_s == None:
+        loc_info = " "
+    elif district !=None:
+        loc_info = "  district = '"+district+"' and "
+    else:
+        loc_info = "  接警单位名称 = '"+police_s+"' and "
+
+    if time_unit == 'm':
+        #取至分钟位
+        sql = "select overlay( 接警时间 placing '00' from 13 for 14) from "+data_set+" where ("+loc_info+" 接警时间 >'"+ start_time+"' and 接警时间< '"+end_time+"') order by 接警时间"
+    if time_unit == 'h':
+        #取至小时位
+        sql =  "select overlay( 接警时间 placing '0000' from 11 for 14) from "+data_set+" where ("+loc_info+" 接警时间 >'"+ start_time+"' and 接警时间< '"+end_time+"') order by 接警时间"
+    if time_unit == 'd':
+        #取至天
+        sql = "select overlay( 接警时间 placing '000000' from 9 for 14) from "+data_set+" where ("+loc_info+" 接警时间 >'"+ start_time+"' and 接警时间< '"+end_time+"') order by 接警时间"
+        #sql = "select  接警时间 as overlay from table_b where 接警时间 like '2012%'  order by 接警时间 "
+    data = pd.read_sql(sql, conn)
+
+    #时间序列计算
+    time = pd.to_datetime(data.overlay,format="%Y%m%d%H%M%S")
+    dt = (time.values - np.datetime64(start_time)) / np.timedelta64(1, time_unit)
+    dtf = pd.DataFrame(dt)#时间序列
+
+    #时间间隔时间计算
+    interval  = dtf
+    interval.columns = ['interval']
+    interval = interval.diff()
+    interval = interval.fillna(0)#间隔时间序列
+    interval_t= interval.T.values[0]
+    #存入csv_利用matlab进行分析
+    intt = pd.DataFrame(interval_t)
+    intt.to_csv('intt.csv') 
+    return interval_t
+
+#原始频率
+def frequency(interval_t):
+    C = Counter(interval_t)#计算频数
+    t_interval = []#间隔时间
+    freq = [] #频率
+    for i in C:
+        t_interval.append(i)
+        freq.append(C[i]/len(interval_t))
+    #x轴为间隔时间，y轴为频率
+
+    #创建画布
+    fig = plt.figure(dpi = 100)
+    #创建对象
+    ax = fig.add_subplot(111)
+    #自动缩放
+    ax.set_autoscalex_on(True)
+    #轴标题
+    ax.set_xlabel('t')
+    ax.set_ylabel('p(t)')
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    
+    ax.scatter( t_interval,freq,alpha=0.6)
+    
+    #给matlab的数据
+    t = pd.DataFrame(t_interval)
+    t.to_csv('t.csv') 
+    c = pd.DataFrame(freq)
+    c.to_csv('c.csv')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
